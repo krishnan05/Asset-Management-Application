@@ -1,0 +1,69 @@
+@page "/assets"
+@inject IAssetClientService AssetService
+@using AssetManagement.Shared.Models // Access your shared models
+
+<h3>Asset Inventory</h3>
+
+@if (assets == null)
+{
+    <p><em>Loading assets...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Serial Number</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var asset in assets)
+            {
+                <tr>
+                    <td>@asset.Name</td>
+                    <td>@asset.SerialNumber</td>
+                    <td>@asset.Status</td>
+                    <td>
+                        <a href="/assets/edit/@asset.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <button @onclick="() => DeleteAsset(asset.Id)" class="btn btn-sm btn-danger">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a href="/assets/create" class="btn btn-success">Add New Asset</a>
+}
+
+@code {
+    private List<Asset>? assets;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAssets();
+    }
+
+    private async Task LoadAssets()
+    {
+        try
+        {
+            assets = await AssetService.GetAssetsAsync();
+        }
+        catch (Exception ex)
+        { 
+            Console.WriteLine($"Error fetching assets: {ex.Message}");
+            
+        }
+    }
+
+    private async Task DeleteAsset(int id)
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this asset?"))
+        {
+            await AssetService.DeleteAssetAsync(id);
+            await LoadAssets();
+        }
+    }
+}
