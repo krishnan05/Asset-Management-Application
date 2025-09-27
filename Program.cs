@@ -1,34 +1,13 @@
-using AssetManagementApp.Components;
-using AssetManagementApp.Services;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using AssetManagementApp; 
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddHttpClient("ServerApi", client =>
+builder.Services.AddScoped(sp => new HttpClient 
 {
-    // !! IMPORTANT: Use the HTTP port the server is running on
-    client.BaseAddress = new Uri("http://localhost:5083/"); 
+    BaseAddress = new Uri("https://localhost:5083/") 
 });
-builder.Services.AddScoped<IAssetClientService, AssetClientService>();
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
-app.Run();
+await builder.Build().RunAsync();

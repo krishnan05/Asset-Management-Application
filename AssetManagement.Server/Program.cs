@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using AssetManagement.Data;
 using AssetManagement.Data.Repositories;
+using Microsoft.AspNetCore.Builder; 
+using Microsoft.AspNetCore.Hosting; 
+using Microsoft.Extensions.DependencyInjection; 
+using Microsoft.Extensions.Hosting; 
+using Microsoft.Extensions.Configuration; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,13 +18,10 @@ builder.Services.AddDbContext<AssetManagementDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IAssetAssignmentRepository, AssetAssignmentRepository>();
 
-builder.Services.AddScoped<IAssetRepository, AssetRepository>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IAssetAssignmentRepository, AssetAssignmentRepository>();
-builder.Services.AddScoped<IAssetRepository, AssetRepository>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IAssetAssignmentRepository, AssetAssignmentRepository>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -32,6 +34,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 app.UseHttpsRedirection();
-app.MapControllers(); 
+app.MapControllers();
+
+app.UseStaticFiles();
+
+app.UseBlazorFrameworkFiles();
+app.MapFallbackToFile("index.html");
 
 app.Run();
