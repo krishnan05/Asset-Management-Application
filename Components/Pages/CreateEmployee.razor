@@ -1,0 +1,31 @@
+@page "/employees/create"
+@using AssetManagement.Shared.Models
+@using AssetManagementApp.Services
+@inject IEmployeeClientService EmployeeService
+@inject NavigationManager Navigation
+
+<PageTitle>Create New Employee</PageTitle>
+
+<EmployeeForm Employee="NewEmployee" 
+              Title="Create" 
+              OnSubmit="HandleCreateEmployee" />
+
+@code {
+    private Employee NewEmployee = new Employee();
+
+    private async Task HandleCreateEmployee(Employee employeeToCreate)
+    {
+        try
+        {
+            await EmployeeService.AddEmployeeAsync(employeeToCreate);
+            
+            // Redirect to the main employee list upon success
+            Navigation.NavigateTo("/employees");
+        }
+        catch (HttpRequestException ex)
+        {
+            // Simple error handling
+            Console.WriteLine($"Error creating employee: {ex.Message}");
+        }
+    }
+}

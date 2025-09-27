@@ -1,0 +1,54 @@
+@page "/employees/edit/{EmployeeId:int}"
+@using AssetManagement.Shared.Models
+@using AssetManagementApp.Services
+@inject IEmployeeClientService EmployeeService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Employee</PageTitle>
+
+@if (EmployeeToEdit == null)
+{
+    <p><em>Loading employee details...</em></p>
+}
+else
+{
+    <EmployeeForm Employee="EmployeeToEdit" 
+                  Title="Edit" 
+                  OnSubmit="HandleUpdateEmployee" />
+}
+
+@code {
+    [Parameter]
+    public int EmployeeId { get; set; }
+
+    private Employee? EmployeeToEdit;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            // Fetch the employee details using the ID from the route
+            EmployeeToEdit = await EmployeeService.GetEmployeeByIdAsync(EmployeeId);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error fetching employee {EmployeeId}: {ex.Message}");
+            Navigation.NavigateTo("/employees");
+        }
+    }
+
+    private async Task HandleUpdateEmployee(Employee updatedEmployee)
+    {
+        try
+        {
+            await EmployeeService.UpdateEmployeeAsync(updatedEmployee);
+            
+            // Redirect to the main employee list upon success
+            Navigation.NavigateTo("/employees");
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error updating employee: {ex.Message}");
+        }
+    }
+}

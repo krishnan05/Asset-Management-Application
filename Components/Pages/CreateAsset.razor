@@ -1,0 +1,32 @@
+@page "/assets/create"
+@using AssetManagement.Shared.Models
+@using AssetManagementApp.Services
+@inject IAssetClientService AssetService
+@inject NavigationManager Navigation
+
+<PageTitle>Create New Asset</PageTitle>
+
+<AssetForm Asset="NewAsset" 
+           Title="Create" 
+           OnSubmit="HandleCreateAsset" />
+
+@code {
+    private Asset NewAsset = new Asset { PurchaseDate = DateTime.Now };
+
+    private async Task HandleCreateAsset(Asset assetToCreate)
+    {
+        try
+        {
+            await AssetService.CreateAssetAsync(assetToCreate);
+            
+            // Redirect to the main asset list upon success
+            Navigation.NavigateTo("/assets");
+        }
+        catch (HttpRequestException ex)
+        {
+            // Simple error handling
+            Console.WriteLine($"Error creating asset: {ex.Message}");
+            // You might show a toast or message here
+        }
+    }
+}

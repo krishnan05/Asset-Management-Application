@@ -7,8 +7,6 @@ public class AssetAssignment
     public int EmployeeId { get; set; }
     public DateTime AssignedDate { get; set; } = DateTime.UtcNow;
     public DateTime? ReturnDate { get; set; }
-
-    // Navigation
     public Asset? Asset { get; set; }
     public Employee? Employee { get; set; }
 }

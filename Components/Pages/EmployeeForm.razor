@@ -1,0 +1,58 @@
+@using AssetManagement.Shared.Models
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager Navigation
+@using AssetManagementApp.Services 
+<h3>@Title Employee</h3>
+
+<EditForm Model="@Employee" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="Employee.Name" />
+        <ValidationMessage For="@(() => Employee.Name)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="Employee.Email" />
+        <ValidationMessage For="@(() => Employee.Email)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="department" class="form-label">Department</label>
+        <InputText id="department" class="form-control" @bind-Value="Employee.Department" />
+        <ValidationMessage For="@(() => Employee.Department)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="phone" class="form-label">Phone</label>
+        <InputText id="phone" class="form-control" @bind-Value="Employee.Phone" />
+        <ValidationMessage For="@(() => Employee.Phone)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Employee</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Employee Employee { get; set; } = new Employee();
+
+    [Parameter]
+    public EventCallback<Employee> OnSubmit { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "Create";
+
+    private async Task HandleValidSubmit()
+    {
+        await OnSubmit.InvokeAsync(Employee);
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/employees");
+    }
+}

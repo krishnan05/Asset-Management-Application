@@ -1,9 +1,12 @@
-namespace AssetManagement.Shared.Models;
-
-public enum AssetStatus
+namespace AssetManagement.Shared.Models
 {
-    Available,
-    Assigned,
-    UnderMaintenance,
-    Retired
+    public enum AssetStatus 
+    { 
+        // The names used here MUST match the names in AssetContext.cs
+        InUse, 
+        Available,
+        Maintenance,
+        Assigned,
+        Retired
+    }
 }
