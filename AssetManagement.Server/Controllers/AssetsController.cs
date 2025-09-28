@@ -1,11 +1,6 @@
-// Location: AssetManagement.Server/Controllers/AssetsController.cs
-
 using Microsoft.AspNetCore.Mvc;
 using AssetManagement.Data.Repositories;
 using AssetManagement.Shared.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AssetManagement.Server.Controllers
 {
@@ -20,43 +15,21 @@ namespace AssetManagement.Server.Controllers
             _assetRepository = assetRepository;
         }
 
-        // GET: api/assets - Returns AssetDto to break the cycle
+        // GET: api/assets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AssetDto>>> GetAllAssets()
+        public async Task<ActionResult<IEnumerable<Asset>>> GetAllAssets()
         {
             var assets = await _assetRepository.GetAllAssetsAsync();
-            
-            // Map Asset entity to AssetDto 
-            var assetDtos = assets.Select(a => new AssetDto
-            {
-                Id = a.Id,
-                Name = a.Name,
-                SerialNumber = a.SerialNumber,
-                PurchaseDate = a.PurchaseDate,
-                // Convert the AssetStatus enum to its string name
-                Status = a.Status.ToString() 
-            }).ToList();
-            
-            return Ok(assetDtos);
+            return Ok(assets);
         }
 
-        // GET: api/assets/{id} - Returns AssetDto
+        // GET: api/assets/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<AssetDto>> GetAssetById(int id)
+        public async Task<ActionResult<Asset>> GetAssetById(int id)
         {
             var asset = await _assetRepository.GetAssetByIdAsync(id);
             if (asset == null) return NotFound();
-            
-            // Map Asset entity to AssetDto
-            var assetDto = new AssetDto
-            {
-                Id = asset.Id,
-                Name = asset.Name,
-                SerialNumber = asset.SerialNumber,
-                PurchaseDate = asset.PurchaseDate,
-                Status = asset.Status.ToString()
-            };
-            return Ok(assetDto);
+            return Ok(asset);
         }
 
         // POST: api/assets
@@ -64,16 +37,7 @@ namespace AssetManagement.Server.Controllers
         public async Task<ActionResult> AddAsset([FromBody] Asset asset)
         {
             await _assetRepository.AddAssetAsync(asset);
-            
-            // Return AssetDto to prevent JSON cycle crash on return value
-            var assetDto = new AssetDto { 
-                Id = asset.Id, 
-                Name = asset.Name, 
-                SerialNumber = asset.SerialNumber,
-                PurchaseDate = asset.PurchaseDate,
-                Status = asset.Status.ToString()
-            };
-            return CreatedAtAction(nameof(GetAssetById), new { id = asset.Id }, assetDto);
+            return CreatedAtAction(nameof(GetAssetById), new { id = asset.Id }, asset);
         }
 
         // PUT: api/assets/{id}
