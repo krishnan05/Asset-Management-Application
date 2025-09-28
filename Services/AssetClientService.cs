@@ -1,8 +1,9 @@
 using AssetManagement.Shared.Models;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace AssetManagementApp.Services
 {
@@ -16,23 +17,31 @@ namespace AssetManagementApp.Services
             _httpClient = httpClient;
         }
 
-        // Return type matches interface: Task<List<Asset>?>
-        public async Task<List<Asset>?> GetAssetsAsync()
+        public async Task<List<Asset>?> GetAssetsAsync() 
         {
-            return await _httpClient.GetFromJsonAsync<List<Asset>>(BaseApiUrl);
+            try
+            {
+                // FIX: Use Asset model for deserialization
+                return await _httpClient.GetFromJsonAsync<List<Asset>>(BaseApiUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching assets: {ex.Message}");
+                return null;
+            }
         }
 
-        // Implementation for interface member
         public async Task<Asset?> GetAssetByIdAsync(int id)
         {
+            // FIX: Use Asset model for deserialization
             return await _httpClient.GetFromJsonAsync<Asset>($"{BaseApiUrl}/{id}");
         }
-        
+
         public async Task CreateAssetAsync(Asset asset)
-{
-    var response = await _httpClient.PostAsJsonAsync(BaseApiUrl, asset);
-    response.EnsureSuccessStatusCode();
-}
+        {
+            var response = await _httpClient.PostAsJsonAsync(BaseApiUrl, asset);
+            response.EnsureSuccessStatusCode();
+        }
 
         public async Task UpdateAssetAsync(Asset asset)
         {

@@ -1,15 +1,23 @@
 @page "/assets"
-@using AssetManagementApp.Services
+@using AssetManagement.Shared.Models
+@using AssetManagementApp.Services @* CRITICAL FIX for CS0246 *@
 @inject IAssetClientService AssetService
-@using AssetManagement.Shared.Models 
-@using AssetManagementApp.Services 
-@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime 
 
 <h3>Asset Inventory</h3>
 
-@if (assets == null)
+
+<p>
+    <a href="/assets/create" class="btn btn-primary">Create New Asset</a> @* FIX: Changed to /assets/create (plural) *@
+</p>
+@if (Assets == null)
 {
     <p><em>Loading assets...</em></p>
+}
+else if (!Assets.Any())
+{
+    <p><em>No assets found. Please create a new asset.</em></p>
 }
 else
 {
@@ -18,30 +26,33 @@ else
             <tr>
                 <th>Name</th>
                 <th>Serial Number</th>
+                <th>Purchase Date</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var asset in assets)
+            @foreach (var asset in Assets)
             {
                 <tr>
                     <td>@asset.Name</td>
                     <td>@asset.SerialNumber</td>
+                    <td>@asset.PurchaseDate.ToShortDateString()</td>
                     <td>@asset.Status</td>
                     <td>
-                        <a href="/assets/edit/@asset.Id" class="btn btn-sm btn-primary">Edit</a>
+                    
+                        <a href="/asset/edit/@asset.Id" class="btn btn-sm btn-info">Edit</a>
                         <button @onclick="() => DeleteAsset(asset.Id)" class="btn btn-sm btn-danger">Delete</button>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <a href="/assets/create" class="btn btn-success">Add New Asset</a>
 }
 
+
 @code {
-    private List<Asset>? assets;
+    private List<Asset>? Assets;
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,25 +61,31 @@ else
 
     private async Task LoadAssets()
     {
+        Assets = null; 
         try
         {
-            assets = await AssetService.GetAssetsAsync();
+            Assets = await AssetService.GetAssetsAsync();
         }
         catch (Exception ex)
-        { 
-            Console.WriteLine($"Error fetching assets: {ex.Message}");
-            
+        {
+            Console.WriteLine($"Error loading assets: {ex.Message}");
+            Assets = new List<Asset>(); 
         }
     }
 
     private async Task DeleteAsset(int id)
     {
-        if (await JSRuntime.InvokeAsync<bool>("confirm", new[] { "Are you sure you want to delete this asset?" }))
+        if (await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete Asset {id}?"))
         {
-            await AssetService.DeleteAssetAsync(id);
-            await LoadAssets();
+            try
+            {
+                await AssetService.DeleteAssetAsync(id);
+                await LoadAssets(); 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting asset: {ex.Message}");
+            }
         }
-    }
-}
     }
 }

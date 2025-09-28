@@ -1,4 +1,6 @@
-using AssetManagement.Shared.Models;
+using AssetManagement.Shared.Models; // CRITICAL: Use the model from the Shared project for the signature
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AssetManagement.Data.Repositories
 {
@@ -9,5 +11,8 @@ namespace AssetManagement.Data.Repositories
         Task AddAssignmentAsync(AssetAssignment assignment);
         Task UpdateAssignmentAsync(AssetAssignment assignment);
         Task DeleteAssignmentAsync(int id);
+        
+        // FIX: Add the missing method definition
+        Task<IEnumerable<AssetAssignment>> GetActiveAssignmentsAsync();
     }
 }

@@ -1,5 +1,8 @@
 using AssetManagement.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq; // Required for .Where()
+using System.Threading.Tasks;
 
 namespace AssetManagement.Data.Repositories
 {
@@ -19,6 +22,17 @@ namespace AssetManagement.Data.Repositories
                 .Include(e => e.Employee)
                 .ToListAsync();
         }
+
+        // FIX: Implementation of the required GetActiveAssignmentsAsync method
+        public async Task<IEnumerable<AssetAssignment>> GetActiveAssignmentsAsync()
+        {
+            return await _context.AssetAssignments
+                .Include(a => a.Asset)
+                .Include(e => e.Employee)
+                .Where(a => a.ReturnDate == null) // CRITICAL: Filter where the asset has not been returned
+                .ToListAsync();
+        }
+        // END FIX
 
         public async Task<AssetAssignment?> GetAssignmentByIdAsync(int id)
         {
