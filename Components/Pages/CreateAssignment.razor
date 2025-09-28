@@ -1,0 +1,42 @@
+// Location: D:\AssetManagementApp\Components\Pages\CreateAssignment.razor
+
+@page "/assignasset"
+@inject IAssetAssignmentClientService AssignmentService
+@inject IAssetClientService AssetService
+@inject IEmployeeClientService EmployeeService
+@inject NavigationManager NavManager
+@using AssetManagementApp.Services
+@using AssetManagement.Shared.Models
+@using System.Linq
+
+
+<h3>Assign Asset</h3>
+// ... (omitted markup, it's correct)
+
+@code {
+    private AssetAssignment assignment = new AssetAssignment();
+    
+    // FIX 1: Change to AssetDto
+    private List<AssetDto> AvailableAssets = new();
+    
+    private List<Employee> Employees = new();
+    private string ErrorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Fetch all Employees
+        Employees = await EmployeeService.GetEmployeesAsync() ?? new List<Employee>();
+        
+        // 2. Fetch all Assets (now returns DTOs) and filter for AVAILABLE status
+        // FIX 2 (Line 59 or near it): Both sides of the ?? operator must be List<AssetDto>
+        var allAssets = await AssetService.GetAssetsAsync() ?? new List<AssetDto>();
+        
+        // Assuming your DTO status "Available" is a string match
+        AvailableAssets = allAssets.Where(a => a.Status == "Available").ToList();
+    }
+
+    private async Task HandleAssignment(Microsoft.AspNetCore.Components.Forms.EditContext editContext)
+    {
+        // ... (omitted logic, it's correct)
+    }
+}

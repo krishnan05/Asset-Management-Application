@@ -1,3 +1,5 @@
+// Location: D:\AssetManagementApp\Services\AssetClientService.cs
+
 using AssetManagement.Shared.Models;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -16,23 +18,21 @@ namespace AssetManagementApp.Services
             _httpClient = httpClient;
         }
 
-        // Return type matches interface: Task<List<Asset>?>
-        public async Task<List<Asset>?> GetAssetsAsync()
+        public async Task<List<AssetDto>?> GetAssetsAsync()
         {
-            return await _httpClient.GetFromJsonAsync<List<Asset>>(BaseApiUrl);
+            return await _httpClient.GetFromJsonAsync<List<AssetDto>>(BaseApiUrl);
         }
 
-        // Implementation for interface member
-        public async Task<Asset?> GetAssetByIdAsync(int id)
+        public async Task<AssetDto?> GetAssetByIdAsync(int id)
         {
-            return await _httpClient.GetFromJsonAsync<Asset>($"{BaseApiUrl}/{id}");
+            return await _httpClient.GetFromJsonAsync<AssetDto>($"{BaseApiUrl}/{id}");
         }
         
         public async Task CreateAssetAsync(Asset asset)
-{
-    var response = await _httpClient.PostAsJsonAsync(BaseApiUrl, asset);
-    response.EnsureSuccessStatusCode();
-}
+        {
+            var response = await _httpClient.PostAsJsonAsync(BaseApiUrl, asset);
+            response.EnsureSuccessStatusCode();
+        }
 
         public async Task UpdateAssetAsync(Asset asset)
         {

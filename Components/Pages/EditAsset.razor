@@ -1,3 +1,5 @@
+// Location: D:\AssetManagementApp\Components\Pages\EditAsset.razor
+
 @page "/assets/edit/{AssetId:int}"
 @using AssetManagement.Shared.Models
 @using AssetManagementApp.Services
@@ -6,57 +8,72 @@
 
 <PageTitle>Edit Asset</PageTitle>
 
-@if (AssetToEdit == null)
+@if (AssetToUpdate.Id == 0) // Check the ID of the mapping model instead of checking for null
 {
     <p><em>Loading asset details...</em></p>
 }
 else
 {
-    <AssetForm Asset="AssetToEdit" 
+    <AssetForm Asset="AssetToUpdate" // Pass the mapped Asset model to the form
                Title="Edit" 
                OnSubmit="HandleUpdateAsset" />
 }
 
 
 @code {
-    // Parameter captured from the URL route: /assets/edit/{id}
     [Parameter]
     public int AssetId { get; set; }
 
-    private Asset? AssetToEdit;
-    private bool isLoading = true;
+    // FETCH DTO: Variable to hold the fetched DTO
+    private AssetDto? AssetToEditDto;
+    
+    // FIX 1: MAPPING MODEL: Use the full Asset model for form binding and the update service
+    private Asset AssetToUpdate = new Asset();
 
-    // Runs when the component is initialized and the AssetId is set
+    // FIX 2: Remove or comment out the unused variable to fix warning CS0414
+    // private bool isLoading = true;
+
     protected override async Task OnParametersSetAsync()
     {
-        isLoading = true;
+        // isLoading = true; // No longer needed
         try
         {
-            // Fetch the asset details using the ID from the route
-            AssetToEdit = await AssetService.GetAssetByIdAsync(AssetId);
+            // Fetch the DTO from the service
+            AssetToEditDto = await AssetService.GetAssetByIdAsync(AssetId);
+            
+            if(AssetToEditDto != null)
+            {
+                // Map the fetched DTO data into the full Asset model
+                AssetToUpdate = new Asset
+                {
+                    Id = AssetToEditDto.Id,
+                    Name = AssetToEditDto.Name,
+                    SerialNumber = AssetToEditDto.SerialNumber,
+                    PurchaseDate = AssetToEditDto.PurchaseDate,
+                    // Map Status string back to the AssetStatus enum type
+                    Status = (AssetStatus)Enum.Parse(typeof(AssetStatus), AssetToEditDto.Status)
+                };
+            }
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"Error fetching asset {AssetId}: {ex.Message}");
-            // Navigate to an error page or back to the list
             Navigation.NavigateTo("/assets");
         }
-        isLoading = false;
+        // isLoading = false; // No longer needed
     }
 
     private async Task HandleUpdateAsset(Asset updatedAsset)
     {
         try
         {
+            // The service accepts the full Asset model
             await AssetService.UpdateAssetAsync(updatedAsset);
-            
-            // Redirect to the main asset list upon success
             Navigation.NavigateTo("/assets");
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"Error updating asset: {ex.Message}");
-            // Handle update error (e.g., display message)
         }
     }
 }

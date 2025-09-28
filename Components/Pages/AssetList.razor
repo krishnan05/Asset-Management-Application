@@ -2,7 +2,6 @@
 @using AssetManagementApp.Services
 @inject IAssetClientService AssetService
 @using AssetManagement.Shared.Models 
-@using AssetManagementApp.Services 
 @inject IJSRuntime JSRuntime
 
 <h3>Asset Inventory</h3>
@@ -41,7 +40,8 @@ else
 }
 
 @code {
-    private List<Asset>? assets;
+    // FIX: Change the list type from List<Asset> to List<AssetDto>
+    private List<AssetDto>? assets;
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,12 +52,13 @@ else
     {
         try
         {
+            // The service now returns List<AssetDto>, which matches the 'assets' variable
             assets = await AssetService.GetAssetsAsync();
         }
         catch (Exception ex)
         { 
             Console.WriteLine($"Error fetching assets: {ex.Message}");
-            
+            // Optional: Add user-facing error message here
         }
     }
 
@@ -68,7 +69,5 @@ else
             await AssetService.DeleteAssetAsync(id);
             await LoadAssets();
         }
-    }
-}
     }
 }
