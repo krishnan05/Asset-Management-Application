@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using AssetManagement.Data.Repositories;
-using AssetManagement.Data; 
 using AssetManagement.Shared.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AssetManagement.Server.Controllers
 {
@@ -13,82 +9,53 @@ namespace AssetManagement.Server.Controllers
     public class AssetAssignmentsController : ControllerBase
     {
         private readonly IAssetAssignmentRepository _assignmentRepository;
-        private readonly IAssetRepository _assetRepository; 
 
-        public AssetAssignmentsController(
-            IAssetAssignmentRepository assignmentRepository,
-            IAssetRepository assetRepository)
+        public AssetAssignmentsController(IAssetAssignmentRepository assignmentRepository)
         {
             _assignmentRepository = assignmentRepository;
-            _assetRepository = assetRepository;
-        }
-        
-        // GET: api/AssetAssignments/Active
-        [HttpGet("Active")]
-        public async Task<ActionResult<IEnumerable<AssetAssignmentDto>>> GetActiveAssignments()
-        {
-            // This method now exists in the repository interface
-            var assignments = await _assignmentRepository.GetActiveAssignmentsAsync();
-            var assignmentDtos = assignments.Select(MapToDto).ToList();
-            return Ok(assignmentDtos);
         }
 
-        // POST: api/AssetAssignments/Assign
-        [HttpPost("Assign")]
-        public async Task<ActionResult> AssignAsset([FromBody] AssetAssignment assignment)
+        // GET: api/assetassignments
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AssetAssignment>>> GetAllAssignments()
         {
-            if (assignment.AssetId == 0 || assignment.EmployeeId == 0)
-            {
-                return BadRequest("AssetId and EmployeeId are required.");
-            }
-            var asset = await _assetRepository.GetAssetByIdAsync(assignment.AssetId);
-            if (asset == null || asset.Status != AssetStatus.Available)
-            {
-                return BadRequest($"Asset ID {assignment.AssetId} is not available for assignment.");
-            }
-
-            await _assignmentRepository.AddAssignmentAsync(assignment);
-
-            asset.Status = AssetStatus.Assigned;
-            await _assetRepository.UpdateAssetAsync(asset);
-
-            return NoContent(); 
+            var assignments = await _assignmentRepository.GetAllAssignmentsAsync();
+            return Ok(assignments);
         }
 
-        // PUT: api/AssetAssignments/Return/{assignmentId}
-        [HttpPut("Return/{assignmentId}")]
-        public async Task<ActionResult> ReturnAsset(int assignmentId)
+        // GET: api/assetassignments/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AssetAssignment>> GetAssignmentById(int id)
         {
-            var assignment = await _assignmentRepository.GetAssignmentByIdAsync(assignmentId);
+            var assignment = await _assignmentRepository.GetAssignmentByIdAsync(id);
             if (assignment == null) return NotFound();
+            return Ok(assignment);
+        }
 
-            if (assignment.ReturnDate != null)
-            {
-                return BadRequest("Asset is already marked as returned.");
-            }
+        // POST: api/assetassignments
+        [HttpPost]
+        public async Task<ActionResult> AddAssignment([FromBody] AssetAssignment assignment)
+        {
+            await _assignmentRepository.AddAssignmentAsync(assignment);
+            return CreatedAtAction(nameof(GetAssignmentById), new { id = assignment.Id }, assignment);
+        }
 
-            assignment.ReturnDate = DateTime.Now; 
+        // PUT: api/assetassignments/{id}
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateAssignment(int id, [FromBody] AssetAssignment assignment)
+        {
+            if (id != assignment.Id) return BadRequest();
+
             await _assignmentRepository.UpdateAssignmentAsync(assignment);
-
-            var asset = await _assetRepository.GetAssetByIdAsync(assignment.AssetId);
-            if (asset != null)
-            {
-                asset.Status = AssetStatus.Available;
-                await _assetRepository.UpdateAssetAsync(asset);
-            }
-
             return NoContent();
         }
-        private static AssetAssignmentDto MapToDto(AssetAssignment entity) =>
-            new AssetAssignmentDto
-            {
-                Id = entity.Id,
-                AssetId = entity.AssetId,
-                EmployeeId = entity.EmployeeId,
-                AssignedDate = entity.AssignedDate,
-                ReturnDate = entity.ReturnDate, 
-                AssetName = entity.Asset?.Name ?? "Unknown Asset", 
-                EmployeeName = entity.Employee?.Name ?? "Unknown Employee"
-            };
+
+        // DELETE: api/assetassignments/{id}
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAssignment(int id)
+        {
+            await _assignmentRepository.DeleteAssignmentAsync(id);
+            return NoContent();
+        }
     }
 }

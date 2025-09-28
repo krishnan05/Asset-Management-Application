@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection; 
 using Microsoft.Extensions.Hosting; 
 using Microsoft.Extensions.Configuration; 
-using System.Text.Json.Serialization; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,21 +22,17 @@ builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IAssetAssignmentRepository, AssetAssignmentRepository>();
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    });
-
+builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
         policy =>
-            {
+        {
+            // CRITICAL: Trust the Blazor client's origin
                 policy.WithOrigins("http://localhost:5153")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-            });
+                     .AllowAnyHeader()
+                    .AllowAnyMethod();
+        });
 });
 var app = builder.Build();
 
@@ -49,7 +44,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 
+// ******* CRITICAL FIX: The UseCors call was missing! *******
 app.UseCors(); 
+// ***********************************************************
+
+app.UseHttpsRedirection();
+app.MapControllers();
 
 app.UseStaticFiles();
 

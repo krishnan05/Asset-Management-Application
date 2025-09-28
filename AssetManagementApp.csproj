@@ -5,19 +5,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <RootNamespace>AssetManagementApp</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="AssetManagement.Shared\AssetManagement.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="AssetManagement.Shared\**" /> 
-    <Content Remove="AssetManagement.Shared\**" />
-    <EmbeddedResource Remove="AssetManagement.Shared\**" />
-    <None Remove="AssetManagement.Shared\**" />
 
     <Compile Remove="AssetManagement.Server\**" />
     <Content Remove="AssetManagement.Server\**" />
@@ -28,9 +19,12 @@
     <Content Remove="AssetManagement.Data\**" />
     <EmbeddedResource Remove="AssetManagement.Data\**" />
     <None Remove="AssetManagement.Data\**" />
-  </ItemGroup>
 
-  <ItemGroup>
+    <Compile Remove="AssetManagement.Shared\**" />
+    <Content Remove="AssetManagement.Shared\**" />
+    <EmbeddedResource Remove="AssetManagement.Shared\**" />
+    <None Remove="AssetManagement.Shared\**" />
+
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.4" PrivateAssets="all" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
