@@ -13,7 +13,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient 
 {
     // NOTE: Replace 5083 with your actual ASP.NET Core Server's HTTPS port if different.
-    BaseAddress = new Uri("https://localhost:5083/") 
+    BaseAddress = new Uri("http://localhost:5083/") 
 });
 
 // 2. Register your custom services

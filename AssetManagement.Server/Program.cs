@@ -10,10 +10,10 @@ using Microsoft.Extensions.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<AssetManagementDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -23,7 +23,17 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IAssetAssignmentRepository, AssetAssignmentRepository>();
 
 builder.Services.AddControllers();
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            // CRITICAL: Trust the Blazor client's origin
+                policy.WithOrigins("http://localhost:5153")
+                     .AllowAnyHeader()
+                    .AllowAnyMethod();
+        });
+});
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -33,6 +43,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+
+// ******* CRITICAL FIX: The UseCors call was missing! *******
+app.UseCors(); 
+// ***********************************************************
+
 app.UseHttpsRedirection();
 app.MapControllers();
 
