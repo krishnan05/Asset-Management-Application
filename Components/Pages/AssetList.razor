@@ -1,9 +1,8 @@
 @page "/assets"
-@using AssetManagementApp.Services
-@inject IAssetClientService AssetService
 @using AssetManagement.Shared.Models 
 @using AssetManagementApp.Services 
-@inject IJSRuntime JSRuntime
+@inject IAssetClientService AssetService
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
 <h3>Asset Inventory</h3>
 
@@ -52,23 +51,25 @@ else
     {
         try
         {
-            assets = await AssetService.GetAssetsAsync();
+            // FIX: Use the GetAllAssetsAsync method name to match the service interface
+            assets = await AssetService.GetAllAssetsAsync();
         }
         catch (Exception ex)
         { 
+            // In a real app, you'd show this error to the user
             Console.WriteLine($"Error fetching assets: {ex.Message}");
-            
+            // Initialize to an empty list to show the "Add New Asset" button
+            assets = new List<Asset>(); 
         }
     }
 
     private async Task DeleteAsset(int id)
     {
-        if (await JSRuntime.InvokeAsync<bool>("confirm", new[] { "Are you sure you want to delete this asset?" }))
+        // NOTE: The JSRuntime invoke syntax has been corrected here for best practice.
+        if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this asset?"))
         {
             await AssetService.DeleteAssetAsync(id);
             await LoadAssets();
         }
-    }
-}
     }
 }
