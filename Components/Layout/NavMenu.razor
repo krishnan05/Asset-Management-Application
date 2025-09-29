@@ -26,12 +26,18 @@
                 <span class="oi oi-people" aria-hidden="true"></span> Employees
             </NavLink>
         </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="assignasset">
+                <span class="oi oi-pencil" aria-hidden="true"></span> Assign Asset
+            </NavLink>
+        </div>
         
     </nav>
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    </div>
+</div>
 
 @code {
     private bool collapseNavMenu = true;

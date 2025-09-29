@@ -20,6 +20,7 @@ builder.Services.AddScoped(sp => new HttpClient
 builder.Services.AddScoped<IAssetClientService, AssetClientService>();
 
 builder.Services.AddScoped<IEmployeeClientService, EmployeeClientService>();
+builder.Services.AddScoped<IAssetAssignmentClientService, AssetAssignmentClientService>();
 
 
 await builder.Build().RunAsync();

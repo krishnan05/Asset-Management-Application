@@ -1,0 +1,124 @@
+@page "/assignasset"
+@inject IAssetAssignmentClientService AssignmentService
+@inject IAssetClientService AssetService
+@inject IEmployeeClientService EmployeeService
+@inject NavigationManager NavManager
+
+@using AssetManagementApp.Services
+@using AssetManagement.Shared.Models
+@using System.Linq
+@using Microsoft.AspNetCore.Components.Forms 
+
+<h3>Assign Asset</h3>
+
+<EditForm Model="@assignmentDto" OnValidSubmit="@HandleAssignment">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group mb-3">
+        <label>Asset:</label>
+        <InputSelect @bind-Value="assignmentDto.AssetId" class="form-control">
+            <option value="0">Select Asset</option>
+            @foreach (var asset in AvailableAssets)
+            {
+                <option value="@asset.Id">@asset.Name (@asset.SerialNumber)</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => assignmentDto.AssetId)" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Employee:</label>
+        <InputSelect @bind-Value="assignmentDto.EmployeeId" class="form-control">
+            <option value="0">Select Employee</option>
+            @foreach (var employee in Employees)
+            {
+               <option value="@employee.Id">@employee.Name - (@employee.Department)</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => assignmentDto.EmployeeId)" />
+    </div>
+    
+    <div class="form-group mb-3">
+        <label>Assigned Date:</label>
+        <InputDate @bind-Value="assignmentDto.AssignedDate" class="form-control" />
+        <ValidationMessage For="@(() => assignmentDto.AssignedDate)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Assign</button>
+    <button type="button" class="btn btn-secondary mt-3" @onclick='() => NavManager.NavigateTo("/assets")'>Cancel</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger mt-3">@ErrorMessage</div>
+}
+
+@code {
+    // FIX 1: Use the DTO for the form model
+    private AssetAssignmentDto assignmentDto = new(); 
+    
+    // FIX 2: AssetService should return the full Asset model for filtering Status
+    // We assume AssetService.GetAllAssetsAsync() returns Task<List<Asset>>.
+    private List<Asset> AvailableAssets = new(); 
+    
+    private List<Employee> Employees = new();
+    private string ErrorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Set default date
+        assignmentDto.AssignedDate = DateTime.Today;
+
+        try
+        {
+            // FIX 3: Use the corrected method name for employees
+            Employees = await EmployeeService.GetEmployeesAsync() ?? new List<Employee>();
+            
+            // FIX 4: Use the corrected method name for assets
+            var allAssets = await AssetService.GetAllAssetsAsync() ?? new List<Asset>(); 
+            
+            // Filter Assets: Only show assets with the 'Available' status
+            AvailableAssets = allAssets
+                .Where(a => a.Status == AssetStatus.Available)
+                .ToList();
+
+            // Set default value for InputSelect safety (ID must be int, not enum/string)
+            assignmentDto.AssetId = 0;
+            assignmentDto.EmployeeId = 0;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading assets or employees: {ex.Message}";
+        }
+    }
+
+    private async Task HandleAssignment(Microsoft.AspNetCore.Components.Forms.EditContext editContext)
+    {
+        ErrorMessage = string.Empty;
+        
+        // Manual validation for dropdowns (since they bind to int 0 if nothing selected)
+        if (assignmentDto.AssetId == 0 || assignmentDto.EmployeeId == 0)
+        {
+            ErrorMessage = "Please select both an Asset and an Employee.";
+            return;
+        }
+
+        try
+        {
+            // FIX 5: Use the AssignAssetAsync method which takes the DTO.
+            await AssignmentService.AssignAssetAsync(assignmentDto); 
+            
+            // Navigate to the active assignments list after successful assignment
+            NavManager.NavigateTo("/activeassignments", forceLoad: true);
+        }
+        catch (HttpRequestException ex)
+        {
+            ErrorMessage = $"Assignment failed (HTTP Error): {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"An unexpected error occurred: {ex.Message}";
+        }
+    }
+}

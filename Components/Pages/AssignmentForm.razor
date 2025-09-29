@@ -1,0 +1,123 @@
+@using AssetManagement.Shared.Models
+@using AssetManagementApp.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAssetClientService AssetService
+@inject IEmployeeClientService EmployeeService
+
+<h3>Assign Asset</h3>
+
+<EditForm Model="@AssignmentDto" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="asset" class="form-label">Asset</label>
+        <InputSelect id="asset" class="form-select" @bind-Value="AssignmentDto.AssetId">
+            <option value="0">Select Asset</option>
+            @foreach (var asset in AvailableAssets)
+            {
+                <option value="@asset.Id">@asset.Name (@asset.SerialNumber)</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => AssignmentDto.AssetId)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="employee" class="form-label">Employee</label>
+        <InputSelect id="employee" class="form-select" @bind-Value="AssignmentDto.EmployeeId">
+            <option value="0">Select Employee</option>
+            @foreach (var employee in Employees)
+            {
+                <option value="@employee.Id">@employee.Name (@employee.Department)</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => AssignmentDto.EmployeeId)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="assignedDate" class="form-label">Assigned Date</label>
+        <InputDate id="assignedDate" class="form-control" @bind-Value="AssignmentDto.AssignedDate" />
+        <ValidationMessage For="@(() => AssignmentDto.AssignedDate)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="returnDate" class="form-label">Expected Return Date (Optional)</label>
+        <InputDate id="returnDate" class="form-control" @bind-Value="AssignmentDto.ReturnDate" />
+        <ValidationMessage For="@(() => AssignmentDto.ReturnDate)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Assignment</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public AssetAssignmentDto AssignmentDto { get; set; } = new AssetAssignmentDto();
+
+    [Parameter]
+    public EventCallback<AssetAssignmentDto> OnSubmit { get; set; }
+
+    [Inject]
+    public NavigationManager Navigation { get; set; } = default!;
+
+    private List<Asset> AvailableAssets { get; set; } = new();
+    private List<Employee> Employees { get; set; } = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // NOTE: This assumes your AssetService has a GetAllAssetsAsync,
+            // or you might need a dedicated method to get only 'Available' assets.
+            AvailableAssets = (await AssetService.GetAllAssetsAsync())
+                .Where(a => a.Status == AssetStatus.Available || a.Id == AssignmentDto.AssetId) // Include current asset if editing
+                .ToList();
+            
+            var employees = await EmployeeService.GetEmployeesAsync() ?? new List<Employee>();
+
+            // Set default values if not provided (e.g., when creating a new assignment)
+            if (AssignmentDto.AssetId == 0 && AvailableAssets.Any())
+            {
+                // Set default AssetId to 0 to force user selection
+                AssignmentDto.AssetId = 0; 
+            }
+            if (AssignmentDto.EmployeeId == 0 && Employees.Any())
+            {
+                // Set default EmployeeId to 0 to force user selection
+                AssignmentDto.EmployeeId = 0;
+            }
+            if (AssignmentDto.AssignedDate == default)
+            {
+                AssignmentDto.AssignedDate = DateTime.Today;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading data for assignment form: {ex.Message}");
+            // Handle error (e.g., show error message)
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Ensure user selected an option (InputSelect binding to int will use 0 if no value selected)
+        if (AssignmentDto.AssetId == 0 || AssignmentDto.EmployeeId == 0)
+        {
+            // You should also use custom validation rules for this, but this is a fallback.
+            return; 
+        }
+
+        await OnSubmit.InvokeAsync(AssignmentDto);
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/assignments");
+    }
+}
