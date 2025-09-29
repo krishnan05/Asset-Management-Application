@@ -18,7 +18,6 @@ public class Asset
 
     public AssetStatus Status { get; set; } = AssetStatus.Available;
     
-    // CRITICAL ADDITION
     public DateTime PurchaseDate { get; set; } = DateTime.Now; 
 
     public ICollection<AssetAssignment>? AssetAssignments { get; set; }

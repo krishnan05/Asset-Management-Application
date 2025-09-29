@@ -6,7 +6,6 @@ namespace AssetManagementApp.Services
 {
     public interface IAssetClientService
     {
-        // FIX: Ensure this method exists and is named this way
         Task<List<Asset>?> GetAllAssetsAsync(); 
         
         Task<Asset?> GetAssetByIdAsync(int id);

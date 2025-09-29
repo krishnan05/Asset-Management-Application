@@ -16,10 +16,7 @@ namespace AssetManagement.Shared.Models
         [Required(ErrorMessage = "Assigned date is required")]
         public DateTime AssignedDate { get; set; }
 
-        // Nullable so it's optional
         public DateTime? ReturnDate { get; set; }
-
-        // For display in Active Assignments grid
         public string? AssetName { get; set; }
         public string? EmployeeName { get; set; }
     }

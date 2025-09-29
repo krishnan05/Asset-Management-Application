@@ -19,26 +19,22 @@ else
 
 
 @code {
-    // Parameter captured from the URL route: /assets/edit/{id}
     [Parameter]
     public int AssetId { get; set; }
 
     private Asset? AssetToEdit;
     private bool isLoading = true;
 
-    // Runs when the component is initialized and the AssetId is set
     protected override async Task OnParametersSetAsync()
     {
         isLoading = true;
         try
         {
-            // Fetch the asset details using the ID from the route
             AssetToEdit = await AssetService.GetAssetByIdAsync(AssetId);
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"Error fetching asset {AssetId}: {ex.Message}");
-            // Navigate to an error page or back to the list
             Navigation.NavigateTo("/assets");
         }
         isLoading = false;
@@ -50,13 +46,11 @@ else
         {
             await AssetService.UpdateAssetAsync(updatedAsset);
             
-            // Redirect to the main asset list upon success
             Navigation.NavigateTo("/assets");
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"Error updating asset: {ex.Message}");
-            // Handle update error (e.g., display message)
         }
     }
 }

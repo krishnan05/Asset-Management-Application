@@ -16,9 +16,14 @@ namespace AssetManagementApp.Services
             _httpClient = httpClient;
         }
 
+       
+        public async Task<List<AssetAssignmentDto>?> GetAllAssignmentsAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<List<AssetAssignmentDto>>($"{BaseApiUrl}");
+        }
+
         public async Task<List<AssetAssignmentDto>?> GetActiveAssignmentsAsync()
         {
-            // FIX: Targets server route [HttpGet("Active")]
             return await _httpClient.GetFromJsonAsync<List<AssetAssignmentDto>>($"{BaseApiUrl}/Active"); 
         }
 
@@ -29,14 +34,12 @@ namespace AssetManagementApp.Services
 
         public async Task AssignAssetAsync(AssetAssignmentDto assignment)
         {
-            // FIX: Targets server route [HttpPost("Assign")] (This fixes the 405 error)
             var response = await _httpClient.PostAsJsonAsync($"{BaseApiUrl}/Assign", assignment); 
             response.EnsureSuccessStatusCode();
         }
 
         public async Task ReturnAssetAsync(int id)
         {
-            // FIX: Targets server route [HttpPut("Return/{assignmentId}")]
             var response = await _httpClient.PutAsync($"{BaseApiUrl}/Return/{id}", null);
             response.EnsureSuccessStatusCode();
         }

@@ -19,14 +19,11 @@
         {
             await AssetService.CreateAssetAsync(assetToCreate);
             
-            // Redirect to the main asset list upon success
             Navigation.NavigateTo("/assets");
         }
         catch (HttpRequestException ex)
         {
-            // Simple error handling
             Console.WriteLine($"Error creating asset: {ex.Message}");
-            // You might show a toast or message here
         }
     }
 }

@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using AssetManagement.Data.Repositories;
 using AssetManagement.Shared.Models;
+using System.Collections.Generic;
+using System.Linq; 
+using System.Threading.Tasks;
 
 namespace AssetManagement.Server.Controllers
 {
@@ -17,19 +20,20 @@ namespace AssetManagement.Server.Controllers
 
         // GET: api/assets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Asset>>> GetAllAssets()
+        public async Task<ActionResult<IEnumerable<AssetDto>>> GetAllAssets()
         {
             var assets = await _assetRepository.GetAllAssetsAsync();
-            return Ok(assets);
+            var assetDtos = assets.Select(MapToDto).ToList(); 
+            return Ok(assetDtos);
         }
 
         // GET: api/assets/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Asset>> GetAssetById(int id)
+        public async Task<ActionResult<AssetDto>> GetAssetById(int id)
         {
             var asset = await _assetRepository.GetAssetByIdAsync(id);
             if (asset == null) return NotFound();
-            return Ok(asset);
+            return Ok(MapToDto(asset)); 
         }
 
         // POST: api/assets
@@ -37,7 +41,7 @@ namespace AssetManagement.Server.Controllers
         public async Task<ActionResult> AddAsset([FromBody] Asset asset)
         {
             await _assetRepository.AddAssetAsync(asset);
-            return CreatedAtAction(nameof(GetAssetById), new { id = asset.Id }, asset);
+            return CreatedAtAction(nameof(GetAssetById), new { id = asset.Id }, MapToDto(asset)); 
         }
 
         // PUT: api/assets/{id}
@@ -45,7 +49,6 @@ namespace AssetManagement.Server.Controllers
         public async Task<ActionResult> UpdateAsset(int id, [FromBody] Asset asset)
         {
             if (id != asset.Id) return BadRequest();
-
             await _assetRepository.UpdateAssetAsync(asset);
             return NoContent();
         }
@@ -56,6 +59,18 @@ namespace AssetManagement.Server.Controllers
         {
             await _assetRepository.DeleteAssetAsync(id);
             return NoContent();
+        }
+        
+        private static AssetDto MapToDto(Asset entity)
+        {
+            return new AssetDto
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                SerialNumber = entity.SerialNumber,
+                PurchaseDate = entity.PurchaseDate,
+                Status = entity.Status
+            };
         }
     }
 }

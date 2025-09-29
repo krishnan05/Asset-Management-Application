@@ -49,7 +49,6 @@ namespace AssetManagementApp.Services
 {
     try
     {
-        // Assuming BaseApiUrl is "api/Assets"
         return await _httpClient.GetFromJsonAsync<List<Asset>>(BaseApiUrl);
     }
     catch (Exception ex)

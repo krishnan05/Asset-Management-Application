@@ -1,0 +1,80 @@
+@page "/activeassignments"
+@using AssetManagementApp.Services
+@using AssetManagement.Shared.Models
+@inject IAssetAssignmentClientService AssignmentService
+@inject NavigationManager NavManager
+
+<h3>Active Asset Assignments</h3>
+
+@if (assignments == null)
+{
+    <p><em>Loading active assignments...</em></p>
+}
+else if (!assignments.Any())
+{
+    <p>No assets are currently assigned.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Asset</th>
+                <th>Employee</th>
+                <th>Assigned Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var assignment in assignments)
+            {
+                <tr>
+                    <td>@assignment.AssetName</td>
+                    <td>@assignment.EmployeeName</td>
+                    <td>@assignment.AssignedDate.ToShortDateString()</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" 
+                                @onclick="() => ReturnAsset(assignment.Id)"> 
+                            Return
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<AssetAssignmentDto>? assignments;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadActiveAssignments();
+    }
+
+    private async Task LoadActiveAssignments()
+    {
+        try
+        {
+            assignments = await AssignmentService.GetActiveAssignmentsAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading assignments: {ex.Message}";
+        }
+    }
+
+    private async Task ReturnAsset(int assignmentId)
+    {
+        try
+        {
+            await AssignmentService.ReturnAssetAsync(assignmentId);
+            await LoadActiveAssignments();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error returning asset: {ex.Message}";
+        }
+    }
+}

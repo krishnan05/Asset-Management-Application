@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Linq; // <-- REQUIRED for .Where()
+using System.Linq; 
 using System.Threading.Tasks;
 using AssetManagement.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using AssetManagement.Data; // <-- Assuming DbContext is here
+using AssetManagement.Data; 
 
 namespace AssetManagement.Data.Repositories
 {
@@ -16,14 +16,11 @@ namespace AssetManagement.Data.Repositories
             _context = context;
         }
 
-        // CRITICAL FIX: Implementation for the new interface method
         public async Task<IEnumerable<AssetAssignment>> GetActiveAssignmentsAsync()
         {
             return await _context.AssetAssignments
-                // Include navigation properties needed for DTO mapping
                 .Include(a => a.Asset)
                 .Include(e => e.Employee)
-                // Filter: Only include assignments where the return date is null
                 .Where(aa => aa.ReturnDate == null)
                 .ToListAsync();
         }

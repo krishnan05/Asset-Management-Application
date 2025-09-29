@@ -55,11 +55,8 @@
 }
 
 @code {
-    // FIX 1: Use the DTO for the form model
     private AssetAssignmentDto assignmentDto = new(); 
     
-    // FIX 2: AssetService should return the full Asset model for filtering Status
-    // We assume AssetService.GetAllAssetsAsync() returns Task<List<Asset>>.
     private List<Asset> AvailableAssets = new(); 
     
     private List<Employee> Employees = new();
@@ -67,23 +64,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Set default date
         assignmentDto.AssignedDate = DateTime.Today;
 
         try
         {
-            // FIX 3: Use the corrected method name for employees
             Employees = await EmployeeService.GetEmployeesAsync() ?? new List<Employee>();
             
-            // FIX 4: Use the corrected method name for assets
             var allAssets = await AssetService.GetAllAssetsAsync() ?? new List<Asset>(); 
             
-            // Filter Assets: Only show assets with the 'Available' status
             AvailableAssets = allAssets
                 .Where(a => a.Status == AssetStatus.Available)
                 .ToList();
 
-            // Set default value for InputSelect safety (ID must be int, not enum/string)
             assignmentDto.AssetId = 0;
             assignmentDto.EmployeeId = 0;
         }
@@ -97,7 +89,6 @@
     {
         ErrorMessage = string.Empty;
         
-        // Manual validation for dropdowns (since they bind to int 0 if nothing selected)
         if (assignmentDto.AssetId == 0 || assignmentDto.EmployeeId == 0)
         {
             ErrorMessage = "Please select both an Asset and an Employee.";
@@ -106,10 +97,7 @@
 
         try
         {
-            // FIX 5: Use the AssignAssetAsync method which takes the DTO.
             await AssignmentService.AssignAssetAsync(assignmentDto); 
-            
-            // Navigate to the active assignments list after successful assignment
             NavManager.NavigateTo("/activeassignments", forceLoad: true);
         }
         catch (HttpRequestException ex)

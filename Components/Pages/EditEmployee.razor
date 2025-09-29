@@ -27,7 +27,6 @@ else
     {
         try
         {
-            // Fetch the employee details using the ID from the route
             EmployeeToEdit = await EmployeeService.GetEmployeeByIdAsync(EmployeeId);
         }
         catch (HttpRequestException ex)
@@ -43,7 +42,6 @@ else
         {
             await EmployeeService.UpdateEmployeeAsync(updatedEmployee);
             
-            // Redirect to the main employee list upon success
             Navigation.NavigateTo("/employees");
         }
         catch (HttpRequestException ex)

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using AssetManagement.Data.Repositories; // Assuming this is the correct namespace
+using AssetManagement.Data.Repositories; 
 using AssetManagement.Shared.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System; // Required for DateTime.Now
+using System; 
 
 namespace AssetManagement.Server.Controllers
 {
@@ -22,9 +22,17 @@ namespace AssetManagement.Server.Controllers
             _assignmentRepository = assignmentRepository;
             _assetRepository = assetRepository;
         }
+
+       //GET: api/AssetAssignments (Fetches all assignments)
+        [HttpGet] 
+        public async Task<ActionResult<IEnumerable<AssetAssignmentDto>>> GetAllAssignments()
+        {
+            var assignments = await _assignmentRepository.GetAllAssignmentsAsync();
+            var assignmentDtos = assignments.Select(MapToDto).ToList();
+            return Ok(assignmentDtos);
+        }
         
         // GET: api/AssetAssignments/Active
-        // Client Service is calling this route
         [HttpGet("Active")]
         public async Task<ActionResult<IEnumerable<AssetAssignmentDto>>> GetActiveAssignments()
         {
@@ -34,7 +42,6 @@ namespace AssetManagement.Server.Controllers
         }
 
         // POST: api/AssetAssignments/Assign
-        // Client Service must POST to this route
         [HttpPost("Assign")]
         public async Task<ActionResult> AssignAsset([FromBody] AssetAssignment assignment)
         {
@@ -57,7 +64,6 @@ namespace AssetManagement.Server.Controllers
         }
 
         // PUT: api/AssetAssignments/Return/{assignmentId}
-        // Client Service must PUT to this route
         [HttpPut("Return/{assignmentId}")]
         public async Task<ActionResult> ReturnAsset(int assignmentId)
         {
@@ -90,7 +96,6 @@ namespace AssetManagement.Server.Controllers
                 EmployeeId = entity.EmployeeId,
                 AssignedDate = entity.AssignedDate,
                 ReturnDate = entity.ReturnDate, 
-                // These assume the repository eagerly loads Asset and Employee navigation properties
                 AssetName = entity.Asset?.Name ?? "Unknown Asset", 
                 EmployeeName = entity.Employee?.Name ?? "Unknown Employee"
             };

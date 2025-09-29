@@ -19,12 +19,10 @@
         {
             await EmployeeService.AddEmployeeAsync(employeeToCreate);
             
-            // Redirect to the main employee list upon success
             Navigation.NavigateTo("/employees");
         }
         catch (HttpRequestException ex)
         {
-            // Simple error handling
             Console.WriteLine($"Error creating employee: {ex.Message}");
         }
     }
