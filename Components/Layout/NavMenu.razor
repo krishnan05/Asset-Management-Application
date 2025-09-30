@@ -1,55 +1,38 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">AssetManagementApp</a>
-    </div>
-</div>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+<AuthorizeView>
+    <Authorized>
+        <div class="nav-scrollable" style="@NavMenuStyle">
+            <nav class="flex-column">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Home</NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="assets">Assets</NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="employees">Employees</NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="assignasset">Assign Asset</NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="activeassignments">Active Assignments</NavLink>
+                </div>
+            </nav>
         </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="assets">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Assets
-            </NavLink>
-        </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="employees">
-                <span class="oi oi-people" aria-hidden="true"></span> Employees
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="assignasset">
-                <span class="oi oi-pencil" aria-hidden="true"></span> Assign Asset
-            </NavLink>
-        </div>
-        
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="activeassignments">
-                <span class="oi oi-book" aria-hidden="true"></span> Active Assignments
-            </NavLink>
-        </div>
-   
-        
-    </nav>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-</div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="px-3">Please login to see navigation</div>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-    private bool collapseNavMenu = true;
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private bool collapseNavMenu = false;
+
+    private string NavMenuStyle => collapseNavMenu ? "display:none;" : "display:block;";
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;

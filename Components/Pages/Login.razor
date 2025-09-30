@@ -1,0 +1,70 @@
+@page "/login"
+@using AssetManagementApp.Services
+@inject NavigationManager Navigation
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthProvider
+@inject ILocalStorageService LocalStorage
+@using Blazored.LocalStorage
+
+<h3>Login</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Username</label>
+        <InputText class="form-control" @bind-Value="loginModel.Username" />
+    </div>
+
+    <div class="mb-3">
+        <label>Password</label>
+        <InputText class="form-control" @bind-Value="loginModel.Password" type="password" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+    private string? ErrorMessage;
+
+    private CustomAuthenticationStateProvider CustomAuthProvider =>
+        (CustomAuthenticationStateProvider)AuthProvider;
+
+    private async Task HandleLogin()
+    {
+        var response = await Http.PostAsJsonAsync("api/account/login", loginModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            if (result != null)
+            {
+                await LocalStorage.SetItemAsync("authToken", result.Token);
+                CustomAuthProvider.MarkUserAsAuthenticated(result.Token);
+                Navigation.NavigateTo("/", true); // refresh UI
+            }
+        }
+        else
+        {
+            ErrorMessage = "Invalid username or password.";
+        }
+    }
+
+    public class LoginModel
+    {
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+
+    public class LoginResponse
+    {
+        public string Token { get; set; } = "";
+    }
+}

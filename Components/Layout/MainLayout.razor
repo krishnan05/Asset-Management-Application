@@ -1,23 +1,42 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <div class="page">
+                <div class="sidebar">
+                    <NavMenu />
+                </div>
+                <main>
+                    <div class="top-row px-4">
+                        <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+                    </div>
+                    <article class="content px-4">
+                        @Body
+                    </article>
+                </main>
+            </div>
+        </Authorized>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+        <NotAuthorized>
             @Body
-        </article>
-    </main>
-</div>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Redirect to login only if user is not authenticated and not already on /login
+        if (!user.Identity?.IsAuthenticated ?? false &&
+            !Navigation.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo("/login", forceLoad: false);
+        }
+    }
+}

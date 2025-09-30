@@ -4,7 +4,12 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @using AssetManagement.Shared.Models
+@using Microsoft.AspNetCore.Components.Authorization
 
+<CascadingAuthenticationState>
+
+<AuthorizeView>
+    <Authorized>
 <h3>Asset Assignments</h3>
 
 <a href="/assignments/create" class="btn btn-success mb-3">Assign Asset</a>
@@ -45,8 +50,11 @@ else
             }
         </tbody>
     </table>
-}
 
+}
+</Authorized>
+</AuthorizeView>
+</CascadingAuthenticationState>
 @code {
     private List<AssetAssignmentDto>? assignments;
 
