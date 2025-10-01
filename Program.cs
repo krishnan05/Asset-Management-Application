@@ -21,6 +21,10 @@ builder.Services.AddScoped<IAssetAssignmentClientService, AssetAssignmentClientS
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+builder.Services.AddScoped<CustomAuthenticationStateProvider>(); 
+
+builder.Services.AddScoped<AuthenticationStateProvider>(sp => 
+    sp.GetRequiredService<CustomAuthenticationStateProvider>());
 
 await builder.Build().RunAsync();

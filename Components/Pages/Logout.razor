@@ -1,13 +1,15 @@
 @page "/logout"
 @inject NavigationManager Navigation
 @inject AssetManagementApp.Services.CustomAuthenticationStateProvider AuthProvider
-
 <h3>Logging out...</h3>
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         AuthProvider.MarkUserAsLoggedOut();
+        
+        await Task.Delay(100); 
+        
         Navigation.NavigateTo("/login");
     }
 }

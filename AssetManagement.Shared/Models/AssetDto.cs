@@ -7,7 +7,6 @@ namespace AssetManagement.Shared.Models
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         
-        // 🚀 ADDED MISSING PROPERTY 🚀
         public string AssetType { get; set; } = string.Empty; 
         
         public string SerialNumber { get; set; } = string.Empty;

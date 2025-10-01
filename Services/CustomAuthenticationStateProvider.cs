@@ -25,7 +25,6 @@ namespace AssetManagementApp.Services
                 return new AuthenticationState(_currentUser);
             }
 
-            // Read claims from JWT
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
 
@@ -46,9 +45,12 @@ namespace AssetManagementApp.Services
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
         }
 
-        public void MarkUserAsLoggedOut()
+        public async void MarkUserAsLoggedOut()
         {
+            await _localStorage.RemoveItemAsync("authToken"); 
+            
             _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
+            
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
         }
     }
