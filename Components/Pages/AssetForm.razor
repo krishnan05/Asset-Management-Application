@@ -17,6 +17,12 @@
     </div>
 
     <div class="mb-3">
+        <label for="assetType" class="form-label">Asset Type</label>
+        <InputText id="assetType" class="form-control" @bind-Value="Asset.AssetType" />
+        <ValidationMessage For="@(() => Asset.AssetType)" />
+    </div>
+
+    <div class="mb-3">
         <label for="serialNumber" class="form-label">Serial Number</label>
         <InputText id="serialNumber" class="form-control" @bind-Value="Asset.SerialNumber" />
         <ValidationMessage For="@(() => Asset.SerialNumber)" />

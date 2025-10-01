@@ -63,6 +63,11 @@ namespace AssetManagement.Server.Controllers
         [HttpPost]
         public async Task<ActionResult> AddAsset([FromBody] Asset asset)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
             await _assetRepository.AddAssetAsync(asset);
             return CreatedAtAction(nameof(GetAssetById), new { id = asset.Id }, MapToDto(asset));
         }
@@ -72,6 +77,12 @@ namespace AssetManagement.Server.Controllers
         public async Task<ActionResult> UpdateAsset(int id, [FromBody] Asset asset)
         {
             if (id != asset.Id) return BadRequest();
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             await _assetRepository.UpdateAssetAsync(asset);
             return NoContent();
         }
@@ -90,6 +101,7 @@ namespace AssetManagement.Server.Controllers
             {
                 Id = entity.Id,
                 Name = entity.Name,
+                AssetType = entity.AssetType, 
                 SerialNumber = entity.SerialNumber,
                 PurchaseDate = entity.PurchaseDate,
                 Status = entity.Status

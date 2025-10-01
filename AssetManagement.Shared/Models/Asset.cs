@@ -14,7 +14,7 @@ public class Asset
 
     [Required] 
     [StringLength(50)] 
-    public string AssetType { get; set; } = string.Empty;
+    public string AssetType { get; set; } = string.Empty; 
 
     [Required]
     [StringLength(50)]
