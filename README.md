@@ -90,7 +90,7 @@ The solution structure enforces a clean separation of concerns, ensuring maintai
 | Requirement | Status |
 | :--- | :--- |
 | Seed sample data for testing/demo | ☑️ |
-| Desktop-focused responsive UI | ☑️ |
+| Desktop-focused responsive UI | ✖️ |
 | Error handling and input validation | ☑️ |
 | SQL Server DB setup via EF Core migrations | ☑️ |
 | Admin login credentials included in documentation | ☑️ |
