@@ -1,10 +1,9 @@
 # From .NET Core 3.0 you can use the command: `dotnet new gitignore` to generate a customizable .gitignore file
 
-*.swp
-*.*~
+# Standard Build Outputs and Project Cache
+[Bb]in/
+[Oo]bj/
 project.lock.json
-.DS_Store
-*.pyc
 
 # Visual Studio Code
 .vscode
@@ -24,11 +23,29 @@ x64/
 x86/
 build/
 bld/
-[Bb]in/
-[Oo]bj/
 msbuild.log
 msbuild.err
 msbuild.wrn
 
-# Visual Studio 2015
+# Visual Studio 2015+
 .vs/
+
+# --- ADDITIONAL ENTRIES FOR .NET PROJECTS ---
+
+# 1. Entity Framework Core (EF Core)
+# Migrations are typically recreated on each machine via Update-Database,
+# unless you specifically want to track them.
+# The default recommendation for small projects is to exclude the folder.
+[Mm]igrations/
+*.db
+
+# 2. General Cleanup
+# Include all object and bin folders recursively
+**/[Oo]bj/
+**/[Bb]in/
+
+# Legacy/Editor/System files
+*.swp
+*.*~
+.DS_Store
+*.pyc
