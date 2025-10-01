@@ -1,0 +1,71 @@
+@page "/dashboard"
+@inject IAssetClientService AssetService
+@using AssetManagement.Shared.Models
+@using AssetManagementApp.Services
+<h3>Dashboard</h3>
+
+@if (summary == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Total Assets</h5>
+                <h2>@summary.TotalAssets</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Assigned</h5>
+                <h2>@summary.AssignedAssets</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Available</h5>
+                <h2>@summary.AvailableAssets</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Under Repair</h5>
+                <h2>@summary.UnderRepairAssets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Retired</h5>
+                <h2>@summary.RetiredAssets</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Spare</h5>
+                <h2>@summary.SpareAssets</h2>
+            </div>
+        </div>
+    </div>
+
+    <a href="/assets/list" class="btn btn-primary">Open Asset List</a>
+}
+@code {
+    private AssetSummaryDto? summary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+             summary = await AssetService.GetDashboardDataAsync(); 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching summary: {ex.Message}");
+        }
+    }
+}

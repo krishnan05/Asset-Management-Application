@@ -12,6 +12,10 @@ public class Asset
     [StringLength(100)]
     public string Name { get; set; } = string.Empty;
 
+    [Required] 
+    [StringLength(50)] 
+    public string AssetType { get; set; } = string.Empty;
+
     [Required]
     [StringLength(50)]
     public string SerialNumber { get; set; } = string.Empty;

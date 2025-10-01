@@ -23,7 +23,6 @@ namespace AssetManagement.Server.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest login)
         {
-            // Hardcoded credentials (replace with DB check if needed)
             if (login.Username == "admin" && login.Password == "password123")
             {
                 var claims = new[]

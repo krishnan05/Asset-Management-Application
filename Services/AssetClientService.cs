@@ -16,46 +16,46 @@ namespace AssetManagementApp.Services
             _httpClient = httpClient;
         }
 
-        // Return type matches interface: Task<List<Asset>?>
-        // public async Task<List<Asset>?> GetAssetsAsync()
-        // {
-        //     return await _httpClient.GetFromJsonAsync<List<Asset>>(BaseApiUrl);
-        // }
+        public async Task<List<Asset>?> GetAllAssetsAsync() =>
+            await _httpClient.GetFromJsonAsync<List<Asset>>(BaseApiUrl);
 
-        // Implementation for interface member
-        public async Task<Asset?> GetAssetByIdAsync(int id)
+        public async Task<Asset?> GetAssetByIdAsync(int id) =>
+            await _httpClient.GetFromJsonAsync<Asset>($"{BaseApiUrl}/{id}");
+
+        public async Task CreateAssetAsync(Asset asset) =>
+            (await _httpClient.PostAsJsonAsync(BaseApiUrl, asset)).EnsureSuccessStatusCode();
+
+        public async Task UpdateAssetAsync(Asset asset) =>
+            (await _httpClient.PutAsJsonAsync($"{BaseApiUrl}/{asset.Id}", asset)).EnsureSuccessStatusCode();
+
+        public async Task DeleteAssetAsync(int id) =>
+            (await _httpClient.DeleteAsync($"{BaseApiUrl}/{id}")).EnsureSuccessStatusCode();
+
+        public async Task<AssetSummaryDto?> GetDashboardDataAsync() =>
+            await _httpClient.GetFromJsonAsync<AssetSummaryDto>($"{BaseApiUrl}/summary");
+
+        public async Task<PagedResult<Asset>?> GetFilteredAssetsAsync(AssetFilterParams filters)
         {
-            return await _httpClient.GetFromJsonAsync<Asset>($"{BaseApiUrl}/{id}");
+            var response = await _httpClient.PostAsJsonAsync($"{BaseApiUrl}/filter", filters);
+            return await response.Content.ReadFromJsonAsync<PagedResult<Asset>>();
         }
 
-        public async Task CreateAssetAsync(Asset asset)
+        public async Task<List<Asset>?> GetAssetsForExportAsync(AssetFilterParams filters)
         {
-            var response = await _httpClient.PostAsJsonAsync(BaseApiUrl, asset);
-            response.EnsureSuccessStatusCode();
+            var response = await _httpClient.PostAsJsonAsync($"{BaseApiUrl}/export", filters);
+            return await response.Content.ReadFromJsonAsync<List<Asset>>();
         }
 
-        public async Task UpdateAssetAsync(Asset asset)
+        public async Task<List<Asset>?> SearchAssetsAsync(string? type, AssetStatus? status, string? serialNumber, string? employeeName)
         {
-            var response = await _httpClient.PutAsJsonAsync($"{BaseApiUrl}/{asset.Id}", asset);
-            response.EnsureSuccessStatusCode();
-        }
+            var url = $"{BaseApiUrl}/search?";
 
-        public async Task DeleteAssetAsync(int id)
-        {
-            var response = await _httpClient.DeleteAsync($"{BaseApiUrl}/{id}");
-            response.EnsureSuccessStatusCode();
+            if (!string.IsNullOrEmpty(type)) url += $"type={type}&";
+            if (status.HasValue) url += $"status={status.Value}&";
+            if (!string.IsNullOrEmpty(serialNumber)) url += $"serialNumber={serialNumber}&";
+            if (!string.IsNullOrEmpty(employeeName)) url += $"employeeName={employeeName}&";
+
+            return await _httpClient.GetFromJsonAsync<List<Asset>>(url.TrimEnd('&', '?'));
         }
-        public async Task<List<Asset>?> GetAllAssetsAsync() 
-{
-    try
-    {
-        return await _httpClient.GetFromJsonAsync<List<Asset>>(BaseApiUrl);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error fetching assets: {ex.Message}");
-        return null;
-    }
-}
     }
 }

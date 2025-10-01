@@ -32,7 +32,6 @@
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        // Redirect to login only if user is not authenticated and not already on /login
         if (!user.Identity?.IsAuthenticated ?? false &&
             !Navigation.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase))
         {

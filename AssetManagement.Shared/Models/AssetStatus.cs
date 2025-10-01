@@ -1,11 +1,14 @@
 namespace AssetManagement.Shared.Models
 {
-    public enum AssetStatus 
-    { 
-        InUse, 
+    public enum AssetStatus
+    {
+        InUse,
         Available,
-        Maintenance,
+        // Maintenance,
         Assigned,
-        Retired
+        Retired,
+        Spare,
+        UnderRepair
+        
     }
 }

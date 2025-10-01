@@ -9,7 +9,9 @@ namespace AssetManagement.Data.Repositories
         Task AddAssetAsync(Asset asset);
         Task UpdateAssetAsync(Asset asset);
         Task DeleteAssetAsync(int id);
-       
+        Task<PagedResult<Asset>> GetFilteredAssetsAsync(AssetFilterParams filters);
+        Task<AssetSummaryDto> GetAssetsSummaryAsync();
+        Task<List<Asset>> GetAssetsForExportAsync(AssetFilterParams filters);
         Task<IEnumerable<Asset>> GetAssetsByStatusAsync(AssetStatus status);
     }
 }

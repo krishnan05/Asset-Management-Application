@@ -10,18 +10,15 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// HttpClient configured for your API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5083/") // match server project port
+    BaseAddress = new Uri("http://localhost:5083/") 
 });
 
-// Register your client services
 builder.Services.AddScoped<IAssetClientService, AssetClientService>();
 builder.Services.AddScoped<IEmployeeClientService, EmployeeClientService>();
 builder.Services.AddScoped<IAssetAssignmentClientService, AssetAssignmentClientService>();
 
-// Authentication & Authorization
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

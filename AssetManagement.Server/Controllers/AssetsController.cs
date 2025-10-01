@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using AssetManagement.Data.Repositories;
 using AssetManagement.Shared.Models;
 using System.Collections.Generic;
-using System.Linq; 
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AssetManagement.Server.Controllers
@@ -23,8 +23,31 @@ namespace AssetManagement.Server.Controllers
         public async Task<ActionResult<IEnumerable<AssetDto>>> GetAllAssets()
         {
             var assets = await _assetRepository.GetAllAssetsAsync();
-            var assetDtos = assets.Select(MapToDto).ToList(); 
+            var assetDtos = assets.Select(MapToDto).ToList();
             return Ok(assetDtos);
+        }
+
+        // GET: api/summary 
+        [HttpGet("summary")] 
+        public async Task<ActionResult<AssetSummaryDto>> GetDashboardData()
+        {
+            var summary = await _assetRepository.GetAssetsSummaryAsync();
+            return Ok(summary);
+        }
+
+        // GET: api/Search/filter 
+        [HttpGet("search")]
+        public async Task<ActionResult<PagedResult<AssetDto>>> SearchAssets([FromQuery] AssetFilterParams filters)
+        {
+            var result = await _assetRepository.GetFilteredAssetsAsync(filters);
+
+            var dtoResult = new PagedResult<AssetDto>
+            {
+                Items = result.Items.Select(MapToDto).ToList(),
+                TotalCount = result.TotalCount
+            };
+
+            return Ok(dtoResult);
         }
 
         // GET: api/assets/{id}
@@ -33,7 +56,7 @@ namespace AssetManagement.Server.Controllers
         {
             var asset = await _assetRepository.GetAssetByIdAsync(id);
             if (asset == null) return NotFound();
-            return Ok(MapToDto(asset)); 
+            return Ok(MapToDto(asset));
         }
 
         // POST: api/assets
@@ -41,7 +64,7 @@ namespace AssetManagement.Server.Controllers
         public async Task<ActionResult> AddAsset([FromBody] Asset asset)
         {
             await _assetRepository.AddAssetAsync(asset);
-            return CreatedAtAction(nameof(GetAssetById), new { id = asset.Id }, MapToDto(asset)); 
+            return CreatedAtAction(nameof(GetAssetById), new { id = asset.Id }, MapToDto(asset));
         }
 
         // PUT: api/assets/{id}
@@ -60,7 +83,7 @@ namespace AssetManagement.Server.Controllers
             await _assetRepository.DeleteAssetAsync(id);
             return NoContent();
         }
-        
+
         private static AssetDto MapToDto(Asset entity)
         {
             return new AssetDto
