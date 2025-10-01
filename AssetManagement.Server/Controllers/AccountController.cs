@@ -23,7 +23,10 @@ namespace AssetManagement.Server.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest login)
         {
-            if (login.Username == "admin" && login.Password == "password123")
+            var adminUsername = _configuration["AdminCredentials:Username"];
+            var adminPassword = _configuration["AdminCredentials:Password"];
+
+            if (login.Username == adminUsername && login.Password == adminPassword)
             {
                 var claims = new[]
                 {
@@ -32,7 +35,8 @@ namespace AssetManagement.Server.Controllers
                 };
 
                 var jwtSettings = _configuration.GetSection("JwtSettings");
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]));
+                
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]!)); 
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                 var token = new JwtSecurityToken(
