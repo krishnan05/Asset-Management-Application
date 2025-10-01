@@ -2,7 +2,7 @@
 
 ## 📄 Overview
 
-This is an Asset Management Application developed using **ASP.NET Blazor WebAssembly** (Client) and **Web API** (Server), adhering to a clean **Layered Architecture** (Services/BLL, Data Access/DAL). Not cery good with UI design, so the app have minimal UI feature
+This is an Asset Management Application developed using **ASP.NET Blazor WebAssembly** (Client) and **Web API** (Server), adhering to a clean **Layered Architecture** (Services/BLL, Data Access/DAL). The application currently features minimal UI elements, focusing primarily on robust architecture and data access strategies.
 
 The application provides administrative functionality to manage employees, maintain a central asset inventory, and track asset assignments. It is built to meet high standards for code separation, data access optimization, and secure configuration.
 
@@ -12,8 +12,7 @@ The application provides administrative functionality to manage employees, maint
 * **Database:** Microsoft SQL Server
 * **Authentication:** JWT-based Token Authentication
 
-
----
+***
 
 ## 🔐 Admin Login Credentials
 
@@ -24,7 +23,7 @@ The application uses pre-configured credentials for administrative access, which
 | **Username** | `admin` |
 | **Password** | `password123` |
 
----
+***
 
 ## ⚙️ Setup and Installation Instructions
 
@@ -32,9 +31,23 @@ The application uses pre-configured credentials for administrative access, which
 
 1.  **.NET 8.0 SDK** (or later)
 2.  **Microsoft SQL Server** (LocalDB, Express, or full instance)
+3.  **Visual Studio 2022** (Recommended for solution and project management)
 
+### Step 0: Project Setup and Dependencies 🛠️
 
-### Step 1: Database Configuration
+1.  **Open Terminal:** Navigate to the solution's root directory.
+2.  **Restore Dependencies:** Run the following command to download all required NuGet packages (as defined in the `.csproj` files):
+
+    ```bash
+    dotnet restore
+    ```
+3.  **Build Check:** Run a build to verify the project structure:
+
+    ```bash
+    dotnet build
+    ```
+
+### Step 1: Database Configuration 💾
 
 1.  **Update Connection String:** Open the file `AssetManagement.Server/appsettings.json`.
 2.  Locate the `"ConnectionStrings"` section and update the `DefaultConnection` to point to your local SQL Server instance.
@@ -50,22 +63,37 @@ The application uses pre-configured credentials for administrative access, which
     Open the **Package Manager Console** in Visual Studio. Ensure the **Default project** is set to `AssetManagement.Server`. Run the following command:
 
     ```bash
-    Update-Database 
+    Update-Database
     ```
     This command creates the required schema and runs the integrated data seeding logic for initial testing/demo purposes.
 
-### Step 2: Running the Application
+### Step 2: Running the Application ▶️
 
-The solution requires both the Client (UI) and Server (API) projects to run simultaneously.
+The solution requires both the Client (UI) and Server (API) projects to run simultaneously. Choose one of the two methods below:
+
+#### Option A: Running via Visual Studio (Recommended for Debugging)
 
 1.  **Set Startup Projects:** In Visual Studio, right-click the solution file, select **"Set Startup Projects..."**.
 2.  Choose **"Multiple startup projects"**.
-3.  Set the **Action** for both `AssetManagement.Client` and `AssetManagement.Server` to **"Start"**.
+3.  Set the **Action** for both the Client project (`AssetManagementApp`) and the Server project (`AssetManagement.Server`) to **"Start"**.
 4.  Press **F5** or the **Run** button.
 
 The application will launch in your browser, directing you to the login page.
 
----
+#### Option B: Running via Separate Terminals (CLI)
+
+1.  **Open two separate terminals** (e.g., Command Prompt, PowerShell, or Git Bash) and navigate to the **solution root directory**.
+2.  **Start the API Server:** In the **first terminal**, navigate to the **Server project directory** (`AssetManagement.Server/`) and run:
+    ```bash
+    dotnet run
+    ```
+    *The server will start listening on **`http://localhost:5083`**.*
+3.  **Start the Blazor Client:** In the **second terminal**, navigate to the **Project directory** ( `AssetManagementApp/`) and run:
+    ```bash
+    dotnet run
+    ```
+    *The client will launch a browser instance, typically pointing to **`http://localhost:5153`** (which hosts the WebAssembly app and proxies requests to the server running on port 5083).*
+***
 
 ## 🧱 Architecture and Data Access Strategy
 
@@ -80,10 +108,10 @@ The solution structure enforces a clean separation of concerns, ensuring maintai
 
 ### Dual Data Access Strategy
 
-* **Entity Framework Core:** Used exclusively for **all standard CRUD operations and transactional changes** (e.g., adding a new employee, updating an asset's status) to leverage its change tracking and unit-of-work features.
-* **Dapper:** Used specifically for **performance-sensitive queries and reporting** (e.g., fetching the Dashboard Summary data or large, read-only assignment history lists) to minimize overhead and maximize read speed.
+* **Entity Framework Core:** Used exclusively for **all standard CRUD operations and transactional changes** to leverage its change tracking and unit-of-work features.
+* **Dapper:** Used specifically for **performance-sensitive queries and reporting** to minimize overhead and maximize read speed.
 
----
+***
 
 ## ☑️ Demo Requirements Checklist
 
