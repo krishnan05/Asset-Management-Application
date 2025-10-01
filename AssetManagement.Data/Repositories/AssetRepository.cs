@@ -1,5 +1,8 @@
 using AssetManagement.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AssetManagement.Data.Repositories
 {
@@ -13,10 +16,10 @@ namespace AssetManagement.Data.Repositories
         }
 
         public async Task<IEnumerable<Asset>> GetAllAssetsAsync() =>
-            await _context.Assets.Include(a => a.AssetAssignments).ThenInclude(aa => aa.Employee).ToListAsync();
+            await _context.Assets.Include(a => a.AssetAssignments!).ThenInclude(aa => aa.Employee).ToListAsync();
 
         public async Task<Asset?> GetAssetByIdAsync(int id) =>
-            await _context.Assets.Include(a => a.AssetAssignments).ThenInclude(aa => aa.Employee)
+            await _context.Assets.Include(a => a.AssetAssignments!).ThenInclude(aa => aa.Employee)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
         public async Task AddAssetAsync(Asset asset)
@@ -44,13 +47,12 @@ namespace AssetManagement.Data.Repositories
         public async Task<IEnumerable<Asset>> GetAssetsByStatusAsync(AssetStatus status) =>
             await _context.Assets.Where(a => a.Status == status).ToListAsync();
 
-        // NEW methods
         public async Task<PagedResult<Asset>> GetFilteredAssetsAsync(AssetFilterParams filters)
         {
             var query = _context.Assets.AsQueryable();
 
             if (!string.IsNullOrEmpty(filters.SerialNumber))
-                query = query.Where(a => a.SerialNumber.Contains(filters.SerialNumber));
+                query = query.Where(a => a.SerialNumber!.Contains(filters.SerialNumber));
 
             if (filters.Status.HasValue)
                 query = query.Where(a => a.Status == filters.Status.Value);
@@ -68,17 +70,17 @@ namespace AssetManagement.Data.Repositories
         }
 
         public async Task<AssetSummaryDto> GetAssetsSummaryAsync()
-{
-    return new AssetSummaryDto
-    {
-        TotalAssets = await _context.Assets.CountAsync(),
-        AssignedAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Assigned),
-        AvailableAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Available),
-        UnderRepairAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.UnderRepair),
-        RetiredAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Retired),
-        SpareAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Spare) // ✅ FIX
-    };
-}
+        {
+            return new AssetSummaryDto
+            {
+                TotalAssets = await _context.Assets.CountAsync(),
+                AssignedAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Assigned),
+                AvailableAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Available),
+                UnderRepairAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.UnderRepair),
+                RetiredAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Retired),
+                SpareAssets = await _context.Assets.CountAsync(a => a.Status == AssetStatus.Spare)
+            };
+        }
 
         public async Task<List<Asset>> GetAssetsForExportAsync(AssetFilterParams filters)
         {

@@ -23,11 +23,9 @@ else
     public int AssetId { get; set; }
 
     private Asset? AssetToEdit;
-    private bool isLoading = true;
 
     protected override async Task OnParametersSetAsync()
     {
-        isLoading = true;
         try
         {
             AssetToEdit = await AssetService.GetAssetByIdAsync(AssetId);
@@ -37,7 +35,6 @@ else
             Console.WriteLine($"Error fetching asset {AssetId}: {ex.Message}");
             Navigation.NavigateTo("/assets");
         }
-        isLoading = false;
     }
 
     private async Task HandleUpdateAsset(Asset updatedAsset)

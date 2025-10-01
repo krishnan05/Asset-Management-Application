@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AssetManagement.Data;
 using AssetManagement.Data.Repositories;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +18,14 @@ var jwtSecret = jwtSettings["Secret"];
 var jwtIssuer = jwtSettings["Issuer"];
 var jwtAudience = jwtSettings["Audience"];
 
+// Ensure required JWT configuration is present
+if (string.IsNullOrEmpty(jwtSecret) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
+{
+    throw new InvalidOperationException("One or more required JWT settings (Secret, Issuer, Audience) are missing in configuration.");
+}
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-                       ?? throw new InvalidOperationException("Connection string not found.");
+                         ?? throw new InvalidOperationException("Connection string not found.");
 builder.Services.AddDbContext<AssetManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -46,7 +53,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+        // FIX CS8604: Use '!' to assert that jwtSecret is non-null
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret!))
     };
 });
 

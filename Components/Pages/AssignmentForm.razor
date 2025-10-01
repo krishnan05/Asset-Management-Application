@@ -63,7 +63,6 @@
 
     private List<Asset> AvailableAssets { get; set; } = new();
     private List<Employee> Employees { get; set; } = new();
-    private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -83,10 +82,6 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading data for assignment form: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
         }
     }
 

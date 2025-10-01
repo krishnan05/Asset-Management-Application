@@ -2,7 +2,7 @@
 
 ## 📄 Overview
 
-This is an Asset Management Application developed using **ASP.NET Blazor WebAssembly** (Client) and **Web API** (Server), adhering to a clean **Layered Architecture** (UI, Services/BLL, Data Access/DAL). 
+This is an Asset Management Application developed using **ASP.NET Blazor WebAssembly** (Client) and **Web API** (Server), adhering to a clean **Layered Architecture** (Services/BLL, Data Access/DAL). 
 
 The application provides administrative functionality to manage employees, maintain a central asset inventory, and track asset assignments. It is built to meet high standards for code separation, data access optimization, and secure configuration.
 
@@ -32,7 +32,7 @@ The application uses pre-configured credentials for administrative access, which
 
 1.  **.NET 8.0 SDK** (or later)
 2.  **Microsoft SQL Server** (LocalDB, Express, or full instance)
-3.  **Visual Studio 2022** (Recommended for easy setup)
+
 
 ### Step 1: Database Configuration
 
